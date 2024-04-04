@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { copy, linkIcon, loader, tick } from '../assets';
 import { useLazyGetSummaryQuery } from '../services/article';
 import { useGetChatResponseMutation } from '../services/chatgpt';
-
+import axios from 'axios';
 
 const Demo = () => {
   const [article, setArticle] = useState({
@@ -17,7 +17,7 @@ const Demo = () => {
     content: '',
   });
   const [conversationHistory, setConversationHistory] = useState([]);
-  // const [file, setFile] = useState()
+  const [file, setFile] = useState()
 
   const [getchatResponse, { error, isFetching }] = useGetChatResponseMutation();
 
@@ -34,13 +34,50 @@ const Demo = () => {
     console.log(conversationHistory); // This will log after the state update
   }, [conversationHistory]);
 
+ 
+
   const handleFileChange = async(e) => {
     setFile(e.target.files[0])
+  }
+  const handleSubmit3 = async(e) => {
+    e.preventDefault();
+    console.log()
+  }
+  const handleSubmit2 = async(e) => {
+    e.preventDefault();
+    console.log(file)
+    const formData = new FormData();
+    formData.append('pdf_file', file);
+
+    try {
+        const response = await axios.post('http://127.0.0.1:8080/PDF', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        let pdfContent = {role: 'user', content: response.data.text};
+        let summary = {role: 'assistant', content: response.data.summary};
+        
+        let update = [...conversationHistory, pdfContent, summary];
+
+        setConversationHistory(update)
+
+        const newArticle1 = { url: "PDF submitted", summary: response.data.summary};
+        const updatedAllArticles1 = [newArticle1, ...allArticles];
+
+        setAllArticles(updatedAllArticles1)
+
+        console.log(response.data); // Server response
+    } catch (error) {
+        console.error('Error uploading file:', error);
+    }
+    
   }
 
   const handleSubmit = async(e) => {
     e.preventDefault();
-    console.log(article.url);
+   
     // console.log(file)
 
     // setConversationHistory((prevHistory) => [
@@ -51,12 +88,13 @@ const Demo = () => {
 
     // console.log(conversationHistory)
 
-    const newMessage = {role: 'user', content: article.url};
-    const updatedConversationHistory = [...conversationHistory, newMessage];
+    let newMessage = {role: 'user', content: article.url};
+    let updatedConversationHistory = [...conversationHistory, newMessage];
     
 
     setMessage(newMessage);
     setConversationHistory(updatedConversationHistory);
+    
   
     const { data } = await getchatResponse({ 
       messages: updatedConversationHistory,
@@ -74,12 +112,12 @@ const Demo = () => {
     // I want to use this to get the data from an API and use it in my backend.
     if(data?.result) {
       // console.log(data.result)
-      const newMessage2 = {role: 'assistant', content: data.result};
-      const updatedConversationHistory2 = [...updatedConversationHistory, newMessage2];
+      newMessage = {role: 'assistant', content: data.result};
+      updatedConversationHistory = [...updatedConversationHistory, newMessage];
     
-      setConversationHistory(updatedConversationHistory2);
-      setMessage(newMessage2);
-      // console.log(conversationHistory)
+      setConversationHistory(updatedConversationHistory);
+      setMessage(newMessage);
+      
 
       // console.log(conversationHistory)
       const newArticle = { url: article.url, summary: data.result};
@@ -138,6 +176,8 @@ const Demo = () => {
 
             
           </form>
+
+          <button onClick={handleSubmit2} class="reset_box w-full my-5">Submit PDF</button>
           
           <button onClick={handleReset} class="reset_box w-full">Reset Results</button>
 
@@ -176,7 +216,8 @@ const MessageDisplay = ({ article, isFetching, loader }) => {
     <div className="my-2 max-w-full flex flex-col">
       <div className="link_card gap-1m max-h-60 overflow-y-auto mb-2">{article.url}</div>
       {isFetching ? (
-        <img src={loader} alt="loader" className="w-10 h-10 object-contain" />
+        // <img src={loader} alt="loader" className="w-10 h-10 object-contain" />
+        <p>Loading...</p>
       ) : article.summary ? ( // Check if summary exists
         <div className="flex flex-col gap-3">
           <div className="summary_box">
