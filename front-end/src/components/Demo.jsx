@@ -11,9 +11,14 @@ const Demo = () => {
   });
 
   const [allArticles, setAllArticles] = useState([]);
-  const [file, setFile] = useState()
 
-  // const [getSummary, { error, isFetching }] = useLazyGetSummaryQuery();
+  const [message, setMessage] = useState({
+    role: '',
+    content: '',
+  });
+  const [conversationHistory, setConversationHistory] = useState([]);
+  // const [file, setFile] = useState()
+
   const [getchatResponse, { error, isFetching }] = useGetChatResponseMutation();
 
   useEffect(() => { 
@@ -24,6 +29,11 @@ const Demo = () => {
     }
 
   }, []);
+
+  useEffect(() => {
+    console.log(conversationHistory); // This will log after the state update
+  }, [conversationHistory]);
+
   const handleFileChange = async(e) => {
     setFile(e.target.files[0])
   }
@@ -31,28 +41,60 @@ const Demo = () => {
   const handleSubmit = async(e) => {
     e.preventDefault();
     console.log(article.url);
-    console.log(file)
-    const { data } = await getchatResponse({ 
-      messages: [{ role: 'user', content: article.url }]
-    });
+    // console.log(file)
+
+    // setConversationHistory((prevHistory) => [
+    //   ...prevHistory,
+    //   { role: 'user', content: article.url }, // User message
+    //   { role: 'assistant', content: data.result } // API response
+    // ]);
+
+    // console.log(conversationHistory)
+
+    const newMessage = {role: 'user', content: article.url};
+    const updatedConversationHistory = [...conversationHistory, newMessage];
     
 
+    setMessage(newMessage);
+    setConversationHistory(updatedConversationHistory);
+  
+    const { data } = await getchatResponse({ 
+      messages: updatedConversationHistory,
+      temperature: 0.9,
+      max_tokens: 128,
+      top_k: 5,
+      top_p: 0.9,
+      web_access: false,
+      system_prompt: "",
+    });
+
+   
   
     // The data of .summary is resulted from the JSON that is returned from getSummary.
     // I want to use this to get the data from an API and use it in my backend.
     if(data?.result) {
-      console.log(data.result)
-      const newArticle = { ...article, summary: data.result};
+      // console.log(data.result)
+      const newMessage2 = {role: 'assistant', content: data.result};
+      const updatedConversationHistory2 = [...updatedConversationHistory, newMessage2];
+    
+      setConversationHistory(updatedConversationHistory2);
+      setMessage(newMessage2);
+      // console.log(conversationHistory)
+
+      // console.log(conversationHistory)
+      const newArticle = { url: article.url, summary: data.result};
       const updatedAllArticles = [newArticle, ...allArticles];
+     
+      
 
       setArticle(newArticle);
       setAllArticles(updatedAllArticles);
 
-      console.log(newArticle);
-      console.log(allArticles);
+      // console.log(newArticle);
+      // console.log(allArticles);
 
       localStorage.setItem('articles', JSON.stringify(updatedAllArticles));
-      console.log(updatedAllArticles);
+      // console.log(updatedAllArticles);
 
     }
    
