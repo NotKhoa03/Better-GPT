@@ -6,7 +6,7 @@ import { useGetChatResponseMutation } from '../services/chatgpt';
 import axios from 'axios';
 
 const Demo = () => {
-  
+  const [loading, setLoading] = useState(false);
   
   const [chat, setArticle] = useState({
     message: '',
@@ -52,11 +52,13 @@ const Demo = () => {
     formData.append('pdf_file', file);
 
     try {
+        setLoading(true);
         const response = await axios.post('http://127.0.0.1:8080/PDF', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
         });
+        setLoading(false);
 
         let pdfContent = {role: 'user', content: response.data.text};
         let summary = {role: 'assistant', content: response.data.summary};
@@ -70,7 +72,7 @@ const Demo = () => {
 
         setChatHistory(updatedAllArticles1)
 
-        localStorage.setItem('articles', JSON.stringify(updatedAllArticles));
+        localStorage.setItem('articles', JSON.stringify(updatedAllArticles1));
         localStorage.setItem('history', JSON.stringify(conversationHistory));
 
         console.log(response.data); // Server response
@@ -173,7 +175,7 @@ const Demo = () => {
           </div>
 
 
-        {isLoading ? (
+        {isLoading || loading ? (
           <div className="flex justify-center items-center mb-10 mt-4">
             <Loader />
           </div>
