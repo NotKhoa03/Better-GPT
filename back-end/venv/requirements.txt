@@ -1,0 +1,8 @@
+flask
+flask_cors
+openai
+pdfplumber
+glob2
+textwrap
+PyPDF2
+python-dotenv
