@@ -69,10 +69,65 @@
   }
 }
 
+
+/* CSS */
+.button-34 {
+  background: #5E5DF0;
+  border-radius: 999px;
+  box-shadow: #5E5DF0 0 10px 20px -10px;
+  box-sizing: border-box;
+  color: #FFFFFF;
+  cursor: pointer;
+  font-family: Inter,Helvetica,"Apple Color Emoji","Segoe UI Emoji",NotoColorEmoji,"Noto Color Emoji","Segoe UI Symbol","Android Emoji",EmojiSymbols,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+  opacity: 1;
+  outline: 0 solid transparent;
+  padding: 8px 18px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  width: fit-content;
+  word-break: break-word;
+  border: 0;
+}
+
+
+.loader {
+  width: 40px;
+  height: 60px;
+  position: relative;
+}
+.loader::before,
+.loader::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #5E5DF0;
+  clip-path: polygon(0 0,100% 0, 100% 67%,50% 67%,50% 34%,0 34%);
+  animation: sp7 2s infinite;
+}
+.loader::after {
+  --s:-1,-1;
+}
+@keyframes sp7 {
+    0%,
+    10%  {transform:scale(var(--s,1)) translate(0,0)        rotate(0deg)}
+    33%  {transform:scale(var(--s,1)) translate(0,-20px)    rotate(0deg)}
+    66%  {transform:scale(var(--s,1)) translate(10px,-20px) rotate(-90deg)}
+    90%,
+    100% {transform:scale(var(--s,1)) translate(10px,-10px) rotate(-90deg)}
+}
+
 /* Tailwind Styles */
 
 .app {
-  @apply relative z-10;
+  @apply relative z-10 transition-all ease-out duration-300 ml-11;
+}
+
+.app.open{
+  @apply ml-72
 }
 
 .black_btn {
@@ -83,8 +138,8 @@
   @apply mt-5 text-5xl font-extrabold leading-[1.15] text-black sm:text-6xl text-center;
 }
 
-.orange_gradient {
-  @apply bg-gradient-to-r from-amber-500 via-orange-600 to-yellow-500 bg-clip-text text-transparent;
+.blue_gradient {
+  @apply bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-500 bg-clip-text text-transparent;
 }
 
 .desc {
@@ -107,9 +162,7 @@
   @apply w-7 h-7 rounded-full bg-white/10 shadow-[inset_10px_-50px_94px_0_rgb(199,199,199,0.2)] backdrop-blur flex justify-center items-center cursor-pointer;
 }
 
-.blue_gradient {
-  @apply font-black bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent;
-}
+
 
 .summary_box {
   @apply rounded-xl border border-gray-200 bg-white/20 shadow-[inset_10px_-50px_94px_0_rgb(199,199,199,0.2)] backdrop-blur p-4;
@@ -156,3 +209,4 @@
 .stick-nav {
   @apply  bg-white shadow-md flex flex-col w-full gap-2
 }
+

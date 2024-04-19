@@ -1,31 +1,36 @@
 import { useState, useEffect, useRef } from 'react';
-import { copy, linkIcon, loader, tick } from '../assets';
-import { useLazyGetSummaryQuery } from '../services/article';
+import {  linkIcon  } from '../assets';
+import Loader from './Loader';
+
 import { useGetChatResponseMutation } from '../services/chatgpt';
 import axios from 'axios';
 
 const Demo = () => {
-  const [article, setArticle] = useState({
-    url: '',
+  
+  
+  const [chat, setArticle] = useState({
+    message: '',
     summary: '',
   });
 
-  const [allArticles, setAllArticles] = useState([]);
+  const [chatHistory, setChatHistory] = useState([]);
 
-  const [message, setMessage] = useState({
-    role: '',
-    content: '',
-  });
+
   const [conversationHistory, setConversationHistory] = useState([]);
   const [file, setFile] = useState()
 
-  const [getchatResponse, { error, isFetching }] = useGetChatResponseMutation();
+  const [getchatResponse, {isLoading}] = useGetChatResponseMutation();
 
   useEffect(() => { 
     const articlesFromLocalStorage = JSON.parse(localStorage.getItem('articles'))
+    const conversationFromLocalStorage = JSON.parse(localStorage.getItem('history'))
 
     if(articlesFromLocalStorage){
-      setAllArticles(articlesFromLocalStorage)
+      setChatHistory(articlesFromLocalStorage)
+    }
+
+    if(conversationFromLocalStorage){
+      setConversationHistory(conversationFromLocalStorage)
     }
 
   }, []);
@@ -39,10 +44,7 @@ const Demo = () => {
   const handleFileChange = async(e) => {
     setFile(e.target.files[0])
   }
-  const handleSubmit3 = async(e) => {
-    e.preventDefault();
-    console.log()
-  }
+
   const handleSubmit2 = async(e) => {
     e.preventDefault();
     console.log(file)
@@ -63,10 +65,13 @@ const Demo = () => {
 
         setConversationHistory(update)
 
-        const newArticle1 = { url: "PDF submitted", summary: response.data.summary};
-        const updatedAllArticles1 = [newArticle1, ...allArticles];
+        const newArticle1 = { message: "PDF submitted", summary: response.data.summary};
+        const updatedAllArticles1 = [newArticle1, ...chatHistory];
 
-        setAllArticles(updatedAllArticles1)
+        setChatHistory(updatedAllArticles1)
+
+        localStorage.setItem('articles', JSON.stringify(updatedAllArticles));
+        localStorage.setItem('history', JSON.stringify(conversationHistory));
 
         console.log(response.data); // Server response
     } catch (error) {
@@ -77,24 +82,11 @@ const Demo = () => {
 
   const handleSubmit = async(e) => {
     e.preventDefault();
-   
-    // console.log(file)
-
-    // setConversationHistory((prevHistory) => [
-    //   ...prevHistory,
-    //   { role: 'user', content: article.url }, // User message
-    //   { role: 'assistant', content: data.result } // API response
-    // ]);
-
-    // console.log(conversationHistory)
-
-    let newMessage = {role: 'user', content: article.url};
+  
+    let newMessage = {role: 'user', content: chat.message};
     let updatedConversationHistory = [...conversationHistory, newMessage];
-    
-
-    setMessage(newMessage);
+   
     setConversationHistory(updatedConversationHistory);
-    
   
     const { data } = await getchatResponse({ 
       messages: updatedConversationHistory,
@@ -102,12 +94,10 @@ const Demo = () => {
       max_tokens: 128,
       top_k: 5,
       top_p: 0.9,
-      web_access: false,
+      web_access: true,
       system_prompt: "",
     });
 
-   
-  
     // The data of .summary is resulted from the JSON that is returned from getSummary.
     // I want to use this to get the data from an API and use it in my backend.
     if(data?.result) {
@@ -116,22 +106,22 @@ const Demo = () => {
       updatedConversationHistory = [...updatedConversationHistory, newMessage];
     
       setConversationHistory(updatedConversationHistory);
-      setMessage(newMessage);
+     
       
 
       // console.log(conversationHistory)
-      const newArticle = { url: article.url, summary: data.result};
-      const updatedAllArticles = [newArticle, ...allArticles];
+      const newArticle = { message: chat.message, summary: data.result};
+      const updatedAllArticles = [newArticle, ...chatHistory];
      
       
 
       setArticle(newArticle);
-      setAllArticles(updatedAllArticles);
+      setChatHistory(updatedAllArticles);
 
-      // console.log(newArticle);
-      // console.log(allArticles);
+      
 
       localStorage.setItem('articles', JSON.stringify(updatedAllArticles));
+      localStorage.setItem('history', JSON.stringify(conversationHistory));
       // console.log(updatedAllArticles);
 
     }
@@ -139,12 +129,15 @@ const Demo = () => {
   };
 
   const handleReset = () => {
-    setAllArticles([]); // Clear the state
+    setChatHistory([]); // Clear the state
     localStorage.removeItem('articles'); // Clear local storage
   };
+
+
   return (
     
     <section className="demo overflow-y-auto">
+
         {/* side menu */}
         
         {/* Search */}
@@ -154,8 +147,8 @@ const Demo = () => {
             <input 
               type="text" 
               placeholder="Enter a URL" 
-              value={article.url} 
-              onChange={(e) => setArticle({article, url: e.target.value })}
+              value={chat.message} 
+              onChange={(e) => setArticle({chat, message: e.target.value })}
               required
               className="url_input peer"
             />
@@ -171,38 +164,27 @@ const Demo = () => {
               className="submit_btn peer-focus:border-gray-700 peer-focus:text-gray-700">
                 Enter
             </button>
-
-           
-
-            
           </form>
 
-          <button onClick={handleSubmit2} class="reset_box w-full my-5">Submit PDF</button>
-          
-          <button onClick={handleReset} class="reset_box w-full">Reset Results</button>
+          <div className='flex justify-center gap-5 my-5'>
+            <button onClick={handleSubmit2} class="button-34">Submit PDF</button>
+            
+            <button onClick={handleReset} class="button-34">New Chat</button>
+          </div>
 
-          {/* Browse URL History */}
-        {/* <div className="flex flex-col gap-1m max-h-60 overflow-y-auto">
-          {allArticles.map((item, index) => (
-            <div key ={`link-${index}`} onClick={() => setArticle(item)} className="link_card">
-                <div>
-                  <img src={copy} alt="copy_icon" className="w-[100%] h =[100%] object-contain"/>
-                </div>
-                <p className="flex-1 font-satoshi text-blue-700 font-medium text-sm truncate">{item.url}</p>
- 
-            </div>
-          ))}
 
-        </div> */}
-       
-       
+        {isLoading ? (
+          <div className="flex justify-center items-center mb-10 mt-4">
+            <Loader />
+          </div>
+        ) : null}
         {/* Display Results */}
-        {allArticles.map((message, index) => (
+      
+        {chatHistory.map((message, index) => (
           <MessageDisplay
             key={index}
-            article={message}
-            isFetching={isFetching}
-            loader={loader}
+            chat={message}
+        
           />
         ))}
     </section>
@@ -211,18 +193,16 @@ const Demo = () => {
 
 //create a component that takes in a message
 
-const MessageDisplay = ({ article, isFetching, loader }) => {
+const MessageDisplay = ({ chat }) => {
+  
   return (
     <div className="my-2 max-w-full flex flex-col">
-      <div className="link_card gap-1m max-h-60 overflow-y-auto mb-2">{article.url}</div>
-      {isFetching ? (
-        // <img src={loader} alt="loader" className="w-10 h-10 object-contain" />
-        <p>Loading...</p>
-      ) : article.summary ? ( // Check if summary exists
+      <div className="link_card gap-1m max-h-60 overflow-y-auto mb-2">{chat.message}</div>
+      {chat.summary ? ( // Check if summary exists
         <div className="flex flex-col gap-3">
           <div className="summary_box">
             <p className="font-inter font-medium text-sm text-gray-700">
-              {article.summary}
+              {chat.summary}
             </p>
           </div>
         </div>

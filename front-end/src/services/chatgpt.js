@@ -27,10 +27,10 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
   export const chatAPI = createApi({
         reducerPath: 'chatAPI',
         baseQuery: fetchBaseQuery({
-            baseUrl: 'https://open-ai21.p.rapidapi.com/',
+            baseUrl: 'https://chatgpt-42.p.rapidapi.com/',
             prepareHeaders: (headers) => {
                 headers.set('X-RapidAPI-Key', '676e570cf3msh6de3d2a1f7176fep1fcd7cjsn9cb864a03b53');
-                headers.set('X-RapidAPI-Host', 'open-ai21.p.rapidapi.com');
+                headers.set('X-RapidAPI-Host', 'chatgpt-42.p.rapidapi.com');
                 headers.set('content-type', 'application/json');
                 return headers;
             }
@@ -38,7 +38,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
         endpoints: (builder) => ({
             getChatResponse: builder.mutation({
                 query: (chatData, temperature, max_tokens, top_k, top_p, web_access, system_prompt) => ({
-                    url: '/conversationgpt35',
+                    url: '/conversationgpt4',
                     method: 'POST',
                     body: {...chatData, temperature,
                       max_tokens, top_k, top_p, web_access, system_prompt

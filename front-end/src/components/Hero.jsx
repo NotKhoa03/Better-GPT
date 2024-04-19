@@ -7,7 +7,7 @@ const Hero = () => {
             <img src={logo} alt="sumz_logo" className="w-28 object-contain"/>
             <button 
                 type="button"
-                onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley')}
+                onClick={() => window.open('https://github.com/NotKhoa03/Better-GPT')}
                 className="black_btn"
             > 
                 GitHub
@@ -16,7 +16,7 @@ const Hero = () => {
 
         <h1 className="head_text">
             Summarize Articles with
-            <span className="orange_gradient"> OpenAI GPT-3</span>
+            <span className="blue_gradient"> OpenAI GPT-3</span>
         </h1>
         <h2 className="desc">
             Be able to use ChatGPT on Youtube videos, websites, and pdf articles to further stimulate your experience with AI

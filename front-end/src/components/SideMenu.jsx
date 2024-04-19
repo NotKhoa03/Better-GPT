@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
  // Import your CSS
 
-const SideMenu = () => {
-  const [isOpen, setIsOpen] = useState(true);
+const SideMenu = ({ isOpen, toggleMenu }) => {
+  // const [isOpen, setIsOpen] = useState(true);
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
+  // const toggleMenu = () => {
+  //   setIsOpen(!isOpen);
+  // };
 
   return (
     <div className={`side-menu ${isOpen ? 'open' : ''}`}>
@@ -27,3 +27,7 @@ const SideMenu = () => {
 };
 
 export default SideMenu;
+
+export const useMenuState = () => {
+  return [isOpen, setIsOpen];
+};
