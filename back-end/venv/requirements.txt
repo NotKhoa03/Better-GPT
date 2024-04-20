@@ -5,3 +5,4 @@ pdfplumber
 glob2
 PyPDF2
 python-dotenv
+waitress

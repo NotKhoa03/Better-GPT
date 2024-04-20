@@ -3,8 +3,7 @@
     "concurrently": "^8.2.2"
   },
   "scripts": {
-    "start-flask": "cd back-end/ && venv\\Scripts\\activate && cd venv && python main.py",
-    "start-react": "cd front-end && npm run dev",
-    "start": "concurrently \"npm run start-flask\" \"npm run start-react\""
+    "start": "cd back-end/ && venv\\Scripts\\activate && cd venv && waitress-serve --port=8080 main:app",
+    "build": "cd front-end && npm install && npm run build && cd ../back-end/venv && pip install -r requirements.txt"
   }
 }
