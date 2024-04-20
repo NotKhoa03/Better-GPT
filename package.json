@@ -3,7 +3,7 @@
     "concurrently": "^8.2.2"
   },
   "scripts": {
-    "start": "cd back-end/ && venv\\Scripts\\activate && cd venv && waitress-serve --port=8080 main:app",
+    "start": "cd back-end/venv && waitress-serve --port=8080 main:app",
     "build": "cd front-end && npm install && npm run build && cd ../back-end/venv && pip install -r requirements.txt"
   }
 }
