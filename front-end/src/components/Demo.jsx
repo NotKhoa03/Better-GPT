@@ -53,7 +53,7 @@ const Demo = () => {
 
     try {
         setLoading(true);
-        const response = await axios.post('http://127.0.0.1:8080/PDF', formData, {
+        const response = await axios.post('/PDF', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
